@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace Snake_Kilunina
 {
-    internal class Program
+    class Program
     {
+        public static List<Leaders> Leaders = new List<Leaders>();
+        public static List<ViewModelUserSettings> remoteIPAddres = new List<ViewModelUserSettings>();
+        public static List<ViewModelGame> ViewModelGame = new List<ViewModelGame>();
+        public static int LocalPort = 5001;
+        public static int Speed = 15;
         static void Main(string[] args)
         {
         }
