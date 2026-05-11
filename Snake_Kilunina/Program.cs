@@ -108,7 +108,22 @@ namespace Snake_Kilunina
 
         private static int AddSnake()
         {
-            throw new NotImplementedException();
+            ViewModelGames viewModelGamesPlayer = new ViewModelGames();
+            viewModelGamesPlayer.SnakesPlayers = new Snakes()
+            {
+                Points = new List<Snakes.Point>()
+                {
+                    new Snakes.Point(30, 10),
+                    new Snakes.Point(20, 10),
+                    new Snakes.Point(10, 10)
+                },
+                direction = Snakes.Direction.Start
+            };
+            viewModelGamesPlayer.Points = new Snakes.Point(
+                new Random().Next(10, 783),
+                new Random().Next(10, 410));
+            viewModelGames.Add(viewModelGamesPlayer);
+            return viewModelGames.FindIndex(x => x == viewModelGamesPlayer);
         }
     }
 }
