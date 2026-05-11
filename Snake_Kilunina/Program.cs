@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Common;
 using Newtonsoft.Json;
 
@@ -14,7 +15,7 @@ namespace Snake_Kilunina
     {
         public static List<Leaders> Leaders = new List<Leaders>();
         public static List<ViewModelUserSettings> remoteIPAddres = new List<ViewModelUserSettings>();
-        public static List<ViewModelGames> ViewModelGame = new List<ViewModelGames>();
+        public static List<ViewModelGames> viewModelGames = new List<ViewModelGames>();
         public static int LocalPort = 5001;
         public static int Speed = 15;
         static void Main(string[] args)
@@ -34,7 +35,7 @@ namespace Snake_Kilunina
                 try
                 {
                     byte[] bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
-                        ViewModelGame.Find(x => x.IdSnake == User.IdSnake)));
+                        viewModelGames.Find(x => x.IdSnake == User.IdSnake)));
                     sender.Send(bytes, bytes.Length, endPoint);
 
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -50,6 +51,64 @@ namespace Snake_Kilunina
                     sender.Close();
                 }
             }
+        }
+
+        public static void Receiver()
+        {
+            UdpClient receivingUdpClient = new UdpClient();
+            IPEndPoint endPoint = null;
+
+            try
+            {
+                Console.WriteLine("Команды сервера: ");
+                while (true) {
+                    byte[] receiverData = receivingUdpClient.Receive(ref endPoint);
+
+                    string returnData = Encoding.UTF8.GetString(receiverData);
+                    string[] dataMessage = returnData.Split('|');
+                    ViewModelUserSettings User = JsonConvert.DeserializeObject<ViewModelUserSettings>(dataMessage[1]);
+                    if (returnData.ToString().Contains("/start"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"Подключился пользователь: {User.IpAddress}:{User.Port}");
+
+                        remoteIPAddres.Add(User);
+                        User.IdSnake = AddSnake();
+                        viewModelGames[User.IdSnake].IdSnake = User.IdSnake;
+                    }
+                    else
+                    {
+                        int IdPlayer = -1;
+                        IdPlayer = remoteIPAddres.FindIndex(x => x.IpAddress == User.IpAddress &&
+                            x.Port == User.Port);
+                        if (IdPlayer != -1)
+                        {
+                            if (dataMessage[0] == "Up" &&
+                                viewModelGames[IdPlayer].SnakesPlayers.direction != Snakes.Direction.Down)
+                                viewModelGames[IdPlayer].SnakesPlayers.direction = Snakes.Direction.Up;
+                            else if (dataMessage[0] == "Down" &&
+                                viewModelGames[IdPlayer].SnakesPlayers.direction != Snakes.Direction.Up)
+                                viewModelGames[IdPlayer].SnakesPlayers.direction = Snakes.Direction.Down;
+                            else if (dataMessage[0] == "Left" &&
+                                viewModelGames[IdPlayer].SnakesPlayers.direction != Snakes.Direction.Right)
+                                viewModelGames[IdPlayer].SnakesPlayers.direction = Snakes.Direction.Left;
+                            else if (dataMessage[0] == "Right" &&
+                                viewModelGames[IdPlayer].SnakesPlayers.direction != Snakes.Direction.Left)
+                                viewModelGames[IdPlayer].SnakesPlayers.direction = Snakes.Direction.Right;
+                        }
+                    }
+                }
+            }
+            catch(Exception exp)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Возникло исключение: " + exp.Message);
+            }
+        }
+
+        private static int AddSnake()
+        {
+            throw new NotImplementedException();
         }
     }
 }
