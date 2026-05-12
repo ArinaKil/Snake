@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -222,9 +223,33 @@ namespace Snake_Kilunina
                         }
                     }
                 }
-
                 Send();
             }
+        }
+
+        public static void SaveLeaders()
+        {
+            string Json = JsonConvert.SerializeObject(Leaders);
+            StreamWriter sw = new StreamWriter("./leaders.txt");
+            sw.WriteLine(Json);
+            sw.Close();
+        }
+        public static void LoadLeaders()
+        {
+            if (File.Exists("./leaders.txt"))
+            {
+                StreamReader sr = new StreamReader("./leaders.txt");
+                string Json = sr.ReadLine();
+                sr.Close();
+
+                if (!String.IsNullOrEmpty(Json))
+                {
+                    Leaders = JsonConvert.DeserializeObject<List<Leaders>>(Json);
+                }
+                else Leaders = new List<Leaders>();
+            }
+            else
+                Leaders = new List<Leaders>();
         }
     }
 }
