@@ -1,19 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Common;
 using SnakeWPF.Pages;
 
@@ -30,8 +19,8 @@ namespace SnakeWPF
         public static IPAddress remoteIPAddress = IPAddress.Parse("127.0.0.1");
         public static int Port = 5001;
 
-        public ThreadStaticAttribute tRec;
-        public UdpClient recivingUpdClient;
+        public Thread tRec;
+        public UdpClient receivingUpdClient;
 
         public Home Home = new Home();
         public Game Game = new Game();
@@ -40,6 +29,12 @@ namespace SnakeWPF
         {
             InitializeComponent();
             mainWindow = this;
+        }
+
+        public void StartReceiver()
+        {
+            tRec = new Thread(new ThreadStart(Receiver));
+            tRec.Start();
         }
     }
 }
