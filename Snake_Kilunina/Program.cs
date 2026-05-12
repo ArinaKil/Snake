@@ -69,7 +69,7 @@ namespace Snake_Kilunina
 
         public static void Receiver()
         {
-            UdpClient receivingUdpClient = new UdpClient();
+            UdpClient receivingUdpClient = new UdpClient(LocalPort);
             IPEndPoint endPoint = null;
 
             try
@@ -231,7 +231,7 @@ namespace Snake_Kilunina
                                 Name = User.Name,
                                 Points = Snake.Points.Count - 3
                             });
-                            saveLeaders();
+                            SaveLeaders();
                         }
                     }
                 }
