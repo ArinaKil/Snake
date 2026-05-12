@@ -161,7 +161,7 @@ namespace Snake_Kilunina
                 foreach (ViewModelUserSettings User in remoteIPAddres)
                 {
                     Snakes Snake = viewModelGames.Find(x => x.IdSnake == User.IdSnake).SnakesPlayers;
-                    for (int iSnake = Snake.Points.Count - 1; iSnake >= 0; iSnake++)
+                    for (int iSnake = Snake.Points.Count - 1; iSnake >= 0; iSnake--)
                     {
                         if (iSnake != 0)
                         {
