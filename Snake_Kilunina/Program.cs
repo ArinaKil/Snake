@@ -222,6 +222,8 @@ namespace Snake_Kilunina
                         }
                     }
                 }
+
+                Send();
             }
         }
     }
