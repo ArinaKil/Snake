@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using Common;
+using Newtonsoft.Json;
 using SnakeWPF.Pages;
 
 namespace SnakeWPF
@@ -35,6 +39,48 @@ namespace SnakeWPF
         {
             tRec = new Thread(new ThreadStart(Receiver));
             tRec.Start();
+        }
+        public void Receiver()
+        {
+            receivingUpdClient = new UdpClient(int.Parse(viewModelUserSettings.Port));
+            IPEndPoint RemoteIpEndPoint = null;
+
+            try
+            {
+                while(true)
+                {
+                    byte[] receiveBytes = receivingUpdClient.Receive(ref RemoteIpEndPoint);
+                    string returnData = Encoding.UTF8.GetString(receiveBytes);
+
+                    if (viewModelGames == null)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            OpenPage(Game);
+                        });
+                    }
+
+                    viewModelGames = JsonConvert.DeserializeObject<ViewModelGames>(returnData.ToString());
+                    if (viewModelGames.SnakesPlayers.GameOver == true)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            OpenPage(new Pages.EndGame());
+                        });
+                    }
+                    else
+                    {
+                        Game.CreateUI();
+                    }
+                }
+            } catch (Exception exp)
+            {
+                Debug.WriteLine($"Возникло исключение: {exp.Message}");
+            }
+        }
+        public void OpenPage(Page OpenPage)
+        {
+            frame.Navigate(OpenPage);
         }
     }
 }
